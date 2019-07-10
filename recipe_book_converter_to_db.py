@@ -52,16 +52,24 @@ def recipe_to_list():
 
     return recipes[1:]
 
-print(recipe_to_list())
+recipes = recipe_to_list()
 
 
-if os.path.isfile("TIM.db"):
+if not os.path.isfile("Recipes.db"):
     create_db_command = "CREATE TABLE recipes( id CHAR(5) PRIMARY KEY, name CHAR(50), directions CHAR(8000));"
-    create_db_command = "CREATE TABLE Ingredients( ingredient CHAR(50) PRIMARY KEY);"
-    create_db_command = "CREATE TABLE connection ( recipe_id CHAR(5), ingredient CHAR(50), quantity CHAR(50)" \
-                        "FOREIGN KEY(recipe_id) REFERENCES recipes(id), FOREIGN KEY(ingredient) REFERENCES ingredients(ingredient));"
+    cursor.execute(create_db_command)
+    create_db_command = "CREATE TABLE ingredients( ingredient CHAR(50) PRIMARY KEY);" #is there even any need for this?
+    cursor.execute(create_db_command)
+    create_db_command = "CREATE TABLE connection ( recipe_id CHAR(5), ingredient CHAR(50), quantity CHAR(50)," \
+                        "FOREIGN KEY(recipe_id) REFERENCES recipes(id) FOREIGN KEY(ingredient) REFERENCES ingredients(ingredient));"
+    cursor.execute(create_db_command)
+    create_db_command = "CREATE TABLE users ( username CHAR(50) PRIMARY KEY, password CHAR(50));"
+    cursor.execute(create_db_command)
 
 
+#adding all the data into the db:
+#for recipe in recipes:
+#    command = 'INSERT INTO recipes ("{}","{}","{}")'.format(recipe[0][0],recipe[0][1],recipe[2])
 
 
 
