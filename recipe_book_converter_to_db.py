@@ -30,7 +30,7 @@ def recipe_to_list():
             ing = []
             dir = ""
 
-            name = (line[:break_point], re.compile(r'[\n\r\t]').sub(" ",line[break_point:]).strip())
+            name = (line[:break_point], re.compile(r'[\n\r\t]').sub(" ",line[break_point:]).strip().replace("'","''"))
 
         elif "Ingredients" in line:
             ing_flag = 1
@@ -42,11 +42,12 @@ def recipe_to_list():
                 continue
 
             if line != '\n':
-                ingredient = (line[:break_point], re.compile(r'[\n\t]').sub(" ",line[break_point:]).strip())
+                ingredient = (line[:break_point].replace("'","''"), re.compile(r'[\n\t]').sub(" ",line[break_point:]).strip().replace("'","''"))
                 ing.append(ingredient)
 
         elif dir_flag:
-            dir += re.compile(r'[\n\r\t]').sub(" ",line)
+            dir += re.compile(r'[\n\r\t]').sub(" ",line).replace("'","''")
+        #????????????????????????recipes.append((name, ing, dir))
 
 
 
@@ -55,23 +56,32 @@ def recipe_to_list():
 recipes = recipe_to_list()
 
 
-if not os.path.isfile("Recipes.db"):
-    create_db_command = "CREATE TABLE recipes( id CHAR(5) PRIMARY KEY, name CHAR(50), directions CHAR(8000));"
-    cursor.execute(create_db_command)
-    create_db_command = "CREATE TABLE ingredients( ingredient CHAR(50) PRIMARY KEY);" #is there even any need for this?
-    cursor.execute(create_db_command)
-    create_db_command = "CREATE TABLE connection ( recipe_id CHAR(5), ingredient CHAR(50), quantity CHAR(50)," \
-                        "FOREIGN KEY(recipe_id) REFERENCES recipes(id) FOREIGN KEY(ingredient) REFERENCES ingredients(ingredient));"
-    cursor.execute(create_db_command)
-    create_db_command = "CREATE TABLE users ( username CHAR(50) PRIMARY KEY, password CHAR(50));"
-    cursor.execute(create_db_command)
+
+create_db_command = "CREATE TABLE recipes( id CHAR(5) PRIMARY KEY, name CHAR(50), directions CHAR(8000));"
+cursor.execute(create_db_command)
+
+create_db_command = "CREATE TABLE connection ( recipe_id CHAR(5), ingredient CHAR(50), quantity CHAR(50)," \
+                    "FOREIGN KEY(recipe_id) REFERENCES recipes(id));"# FOREIGN KEY(ingredient) REFERENCES ingredients(ingredient));"
+cursor.execute(create_db_command)
+create_db_command = "CREATE TABLE users ( username CHAR(50) PRIMARY KEY, password CHAR(50));"
+cursor.execute(create_db_command)
 
 
 #adding all the data into the db:
-#for recipe in recipes:
-#    command = 'INSERT INTO recipes ("{}","{}","{}")'.format(recipe[0][0],recipe[0][1],recipe[2])
+for recipe in recipes:
+    id = recipe[0][0]
+    command = """INSERT INTO recipes VALUES ('{}','{}','{}');""".format(id,recipe[0][1],recipe[2])
+    cursor.execute(command)
+    connection.commit()
+#   "SELECT last_insert_rowid()"
 
 
+    for ingredient in recipe[1]:
+        command = """INSERT INTO connection VALUES ('{}','{}','{}');""".format(id,ingredient[1],ingredient[0])
+        cursor.execute(command)
+        connection.commit()
+
+#ENUM
 
 
 
