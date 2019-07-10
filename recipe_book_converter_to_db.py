@@ -1,4 +1,4 @@
-import re, sqlite3
+import re, sqlite3, os
 global cursor
 file = open('C:\\Users\\magshimim\\Desktop\\recipe list.txt',encoding="utf8")
 lines = file.readlines()
@@ -53,3 +53,23 @@ def recipe_to_list():
     return recipes[1:]
 
 print(recipe_to_list())
+
+
+if os.path.isfile("TIM.db"):
+    create_db_command = "CREATE TABLE recipes( id CHAR(5) PRIMARY KEY, name CHAR(50), directions CHAR(8000));"
+    create_db_command = "CREATE TABLE Ingredients( ingredient CHAR(50) PRIMARY KEY);"
+    create_db_command = "CREATE TABLE connection ( recipe_id CHAR(5), ingredient CHAR(50), quantity CHAR(50)" \
+                        "FOREIGN KEY(recipe_id) REFERENCES recipes(id), FOREIGN KEY(ingredient) REFERENCES ingredients(ingredient));"
+
+
+
+
+
+
+
+
+
+
+
+
+
